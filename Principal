@@ -1,0 +1,57 @@
+import nmap
+import subprocess #ejecutar comandos en s.o
+import getpass #contraseña segura
+
+def run_nmap(hosts, ports, arguments, superuser, sudo_password):
+    nm = nmap.PortScanner()
+    
+    if superuser:
+        command = ['sudo', '-S', 'nmap'] #verificar para ejecutar como superuser
+    else:
+        command = ['nmap']
+    
+    command.extend(['-p', ports])
+    command.extend(arguments.split())
+    command.extend(hosts.split(','))  # Dividir los hosts ingresados por comas 
+
+    try:
+        if superuser:
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True, input=sudo_password + "\n")# se utiliza sudo para ejecutar como superusuario
+        else:
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True)
+        
+        print(output)
+    except subprocess.CalledProcessError as e:
+        print("Error:", e.output)
+
+def scan_menu():
+    
+    hosts = input("Introduce los hosts a escanear (pueden ser más de uno, separados por comas): ")
+    ports = input("Introduce los puertos (pueden ser rangos):")
+    arguments = input("Introduzca el argumento de nmap: ")
+    superuser = input("¿Deseas ejecutar el comando como superusuario? (s/n): ").strip().lower() == 's'
+
+    if superuser:
+        sudo_password = getpass.getpass(prompt="Introduzca la contraseña de sudo: ")
+    else:
+        sudo_password = ""
+
+    run_nmap(hosts, ports, arguments, superuser, sudo_password)
+
+def main():
+    while True:
+        print("Menú")
+        print("1. Escanear")
+        print("2. Salir")
+        choice = input("Selecciona una opción: ")
+
+        if choice == '1':
+            scan_menu()
+        elif choice == '2':
+            print("Saliendo del programa")
+            break
+        else:
+            print("Ingrese opcion valida")
+
+if __name__ == "__main__":
+    main()
