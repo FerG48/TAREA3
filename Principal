@@ -1,3 +1,4 @@
+#Biblioteca nmap, subprocess, getpass
 import nmap
 import subprocess #ejecutar comandos en s.o
 import getpass #contraseña segura
